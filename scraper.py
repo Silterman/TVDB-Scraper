@@ -3,35 +3,41 @@ import requests
 import os
 
 link = "https://thetvdb.com/series/house/allseasons/official"
-#link = "https://thetvdb.com/series/the-mentalist/allseasons/official"
-
+dest = "B:\\Emby\\Series\\House\\"
+#
+startSeason = 0 #this is techically 1 due to list indexing
 numSeasons = 8
 
 page = requests.get(link)
-
-dest = "B:\\Emby\\Series\\House\\"
-
 soup = BS(page.content, "html.parser") #grabs entire page HTML and turns it into some sort of class
 
+#Creates a list entry for each UL. 
+#TVDB has a UL for each season in HTML. This is also causing problems with single season shows as it does not use a UL in the HTML.
 seasons = soup.find_all('ul',attrs={"class" : "list-group"})
-#print(seasons)
 
-def findSeasonEpisodes(season, n):
-    destLocal = dest + f"Season {n}\\"
-    output = {}
-    episodesBundle = [name.get_text().strip() for name in season.find_all("h4", attrs={"class": "list-group-item-heading"}) if name.get_text().strip() != ""]
-    episodes = [episode for episode in episodesBundle if 'SPECIAL' not in episode]
+def createSeasonDictionary(season: list) -> dict:    
+    episodeTitleBundle = {}
+
+    #Creates a new list with each entry being a string containing the season, episode number and title.
+    episodes = [name.get_text().strip() for name in season.find_all("h4", attrs={"class": "list-group-item-heading"}) if name.get_text().strip() != ""]
+    #Removes specials from this list due incompatibility, might look into supporting them later
+    episodes = [episode for episode in episodes if 'SPECIAL' not in episode]
+    
     for i in range(len(episodes)):
-        tempEpisode = episodes[i].replace("\n", "").split("                                    ")
-        episodes[i] = tempEpisode
+        #.split entry might need to be made dynamic, but it's not resulted in an error so far
+        episodes[i] = episodes[i].replace("\n", "").split("                                    ")
         #using a lot of replaces to remove forbidden file characters
-        output.update({episodes[i][0][episodes[i][0].index("E"):]:episodes[i][1].replace("?", "").replace("|", "").replace(":", "").replace("*", "").replace("<", "").replace(">", "").replace('"', "")})
-    #print(output)
-    for file in os.listdir(destLocal):
-        if file[:file.index(".")] in output:
-            print(f"Renaming {file} to {file[:file.index('.')]+' '+output[file[:file.index('.')]]+file[file.index('.'):]} in {destLocal}")
-            os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+output[file[:file.index(".")]]+file[file.index("."):])
-    return output
+        episodeTitleBundle.update({episodes[i][0][episodes[i][0].index("E"):]:episodes[i][1].replace("?", "").replace("|", "").replace(":", "").replace("*", "").replace("<", "").replace(">", "").replace('"', "")})
+    return episodeTitleBundle
 
-for i in range(len(seasons[:numSeasons])):
-    findSeasonEpisodes(seasons[i], str(i+1))
+def replaceFilenames(seasonNum: int, episodeTitleBundle: dict) -> None:
+    destLocal = dest + f"Season {seasonNum}\\"
+    for file in os.listdir(destLocal):
+        if file[:file.index(".")] in episodeTitleBundle:
+            print(f"Renaming {file} to {file[:file.index('.')]+' '+episodeTitleBundle[file[:file.index('.')]]+file[file.index('.'):]} in {destLocal}")
+            #os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+output[file[:file.index(".")]]+file[file.index("."):])
+    
+
+for season in range(len(seasons[startSeason:numSeasons])):
+    seasonDictionary = createSeasonDictionary(seasons[season])
+    replaceFilenames(season+1, seasonDictionary)
