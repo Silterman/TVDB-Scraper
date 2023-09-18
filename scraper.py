@@ -17,16 +17,20 @@ seasons = soup.find_all('ul',attrs={"class" : "list-group"})
 #print(seasons)
 
 def findSeasonEpisodes(season, n):
-    destLocal = dest + f"Season {n}"
+    destLocal = dest + f"Season {n}\\"
     output = {}
     episodesBundle = [name.get_text().strip() for name in season.find_all("h4", attrs={"class": "list-group-item-heading"}) if name.get_text().strip() != ""]
     episodes = [episode for episode in episodesBundle if 'SPECIAL' not in episode]
     for i in range(len(episodes)):
         tempEpisode = episodes[i].replace("\n", "").split("                                    ")
         episodes[i] = tempEpisode
-        output.update({episodes[i][0][episodes[i][0].index("E"):]:episodes[i][1]})
+        #using a lot of replaces to remove forbidden file characters
+        output.update({episodes[i][0][episodes[i][0].index("E"):]:episodes[i][1].replace("?", "").replace("|", "").replace(":", "").replace("*", "").replace("<", "").replace(">", "").replace('"', "")})
     #print(output)
-    print(os.listdir(destLocal))
+    for file in os.listdir(destLocal):
+        if file[:file.index(".")] in output:
+            print(f"Renaming {file} to {file[:file.index('.')]+' '+output[file[:file.index('.')]]+file[file.index('.'):]} in {destLocal}")
+            os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+output[file[:file.index(".")]]+file[file.index("."):])
     return output
 
 for i in range(len(seasons[:numSeasons])):
