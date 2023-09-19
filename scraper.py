@@ -35,7 +35,7 @@ def replaceFilenames(seasonNum: int, episodeTitleBundle: dict) -> None:
     for file in os.listdir(destLocal):
         if file[:file.index(".")] in episodeTitleBundle:
             print(f"Renaming {file} to {file[:file.index('.')]+' '+episodeTitleBundle[file[:file.index('.')]]+file[file.index('.'):]} in {destLocal}")
-            #os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+output[file[:file.index(".")]]+file[file.index("."):])
+            os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+output[file[:file.index(".")]]+file[file.index("."):])
     
 
 for season in range(len(seasons[startSeason:numSeasons])):
