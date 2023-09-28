@@ -2,11 +2,11 @@ from bs4 import BeautifulSoup as BS
 import requests
 import os
 
-link = "https://thetvdb.com/series/house/allseasons/official"
-dest = "B:\\Emby\\Series\\House\\"
+link = "https://thetvdb.com/series/uncoupled/allseasons/official"
+dest = "B:\\Emby\\Downloads\\Uncoupled\\"
 #
 startSeason = 0 #this is techically 1 due to list indexing
-numSeasons = 8
+numSeasons = 1
 
 page = requests.get(link)
 soup = BS(page.content, "html.parser") #grabs entire page HTML and turns it into some sort of class
@@ -35,7 +35,7 @@ def replaceFilenames(seasonNum: int, episodeTitleBundle: dict) -> None:
     for file in os.listdir(destLocal):
         if file[:file.index(".")] in episodeTitleBundle:
             print(f"Renaming {file} to {file[:file.index('.')]+' '+episodeTitleBundle[file[:file.index('.')]]+file[file.index('.'):]} in {destLocal}")
-            os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+output[file[:file.index(".")]]+file[file.index("."):])
+            os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+episodeTitleBundle[file[:file.index(".")]]+file[file.index("."):])
     
 
 for season in range(len(seasons[startSeason:numSeasons])):
