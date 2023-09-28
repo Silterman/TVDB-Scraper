@@ -1,12 +1,16 @@
 from bs4 import BeautifulSoup as BS
 import requests
 import os
+import configparser
 
-link = "https://thetvdb.com/series/uncoupled/allseasons/official"
-dest = "B:\\Emby\\Downloads\\Uncoupled\\"
+ini = configparser.ConfigParser()
+ini.read("settings.ini")
+
+link = ini['showSpecifics']['tvdbLink']
+dest = ini['default']['seriesFolderPath'] + ini['showSpecifics']['showName'] + "\\"
 #
-startSeason = 0 #this is techically 1 due to list indexing
-numSeasons = 1
+startSeason = int(ini['showSpecifics']['seasonStart']) - 1
+numSeasons = int(ini['showSpecifics']['seasonEnd'])
 
 page = requests.get(link)
 soup = BS(page.content, "html.parser") #grabs entire page HTML and turns it into some sort of class
