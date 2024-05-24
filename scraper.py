@@ -32,13 +32,14 @@ def createSeasonDictionary(season: list) -> dict:
         episodes[i] = episodes[i].replace("\n", "").split("                                    ")
         #using a lot of replaces to remove forbidden file characters
         episodeTitleBundle.update({episodes[i][0][episodes[i][0].index("E"):]:episodes[i][1].replace("?", "").replace("|", "").replace(":", "").replace("*", "").replace("<", "").replace(">", "").replace('"', "")})
+    print(episodeTitleBundle)
     return episodeTitleBundle
 
 def replaceFilenames(seasonNum: int, episodeTitleBundle: dict) -> None:
     destLocal = dest + f"Season {seasonNum}\\"
     for file in os.listdir(destLocal):
         if file[:file.index(".")] in episodeTitleBundle:
-            print(f"Renaming {file} to {file[:file.index('.')]+' '+episodeTitleBundle[file[:file.index('.')]]+file[file.index('.'):]} in {destLocal}")
+            print(f"Renaming '{file}' to '{file[:file.index('.')]+' '+episodeTitleBundle[file[:file.index('.')]]+file[file.index('.'):]}' in '{destLocal}'")
             os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+episodeTitleBundle[file[:file.index(".")]]+file[file.index("."):])
     
 
