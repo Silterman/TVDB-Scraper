@@ -11,6 +11,7 @@ dest = ini['default']['seriesFolderPath'] + ini['showSpecifics']['showName'] + "
 #
 startSeason = int(ini['showSpecifics']['seasonStart']) - 1
 numSeasons = int(ini['showSpecifics']['seasonEnd'])
+print("Season range:", str(startSeason + 1) + "-" + str(numSeasons))
 
 page = requests.get(link)
 soup = BS(page.content, "html.parser") #grabs entire page HTML and turns it into some sort of class
@@ -43,6 +44,6 @@ def replaceFilenames(seasonNum: int, episodeTitleBundle: dict) -> None:
             os.rename(destLocal+file ,destLocal+file[:file.index(".")]+" "+episodeTitleBundle[file[:file.index(".")]]+file[file.index("."):])
     
 
-for season in range(len(seasons[startSeason:numSeasons])):
+for season in range(startSeason, numSeasons):
     seasonDictionary = createSeasonDictionary(seasons[season])
-    replaceFilenames(season+1, seasonDictionary)
+    replaceFilenames(season + 1, seasonDictionary)
